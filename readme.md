@@ -4,6 +4,7 @@ Example using gRPC wit GoLang.
 
 #### Commands
 
+Creating go module and generate protofile stubs
 ```bash
 # Create Go module
 go mod init github.com/leticiapillar/grpc-user-go
@@ -14,7 +15,18 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 # Generate protofile stubs
 protoc --proto_path=proto proto/*.proto --go_out=pb --go-grpc_out=pb
+```
 
+Implementing Server gRPC
+- dir: `cmd/server/server.go`
+- host: `localhost:5051`
+- 
+```bash
+# Dependence go grpc
+go get google.golang.org/grpc
+
+# Run server
+go run cmd/server/server.go
 ```
 
 #### References
