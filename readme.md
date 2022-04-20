@@ -20,7 +20,6 @@ protoc --proto_path=proto proto/*.proto --go_out=pb --go-grpc_out=pb
 **Server gRPC implementation**
 - dir: `cmd/server/server.go`
 - host: `localhost:5051`
-- 
 ```bash
 # Dependence go grpc
 go get google.golang.org/grpc
@@ -56,9 +55,23 @@ email (TYPE_STRING) => leticia@leticia.com
 }
 ```
 
+**Client gRPC implementation**
+- Client requests UserServer to add an user
+- dir: `cmd/client/client.go`
+
+```bash
+# Run server
+go run cmd/server/server.go
+
+# Run client
+go run cmd/client/client.
+# id:"123"  name:"Leticia"  email:"leticia@test.com"
+```
+
+
+
 #### References
 - [gRPC](https://grpc.io/)
 - [Google: Protobuf](https://developers.google.com/protocol-buffers)
 - [Google: Protocol Buffer Basics: Go](https://developers.google.com/protocol-buffers/docs/gotutorial)
 - Course: Full Cycle 3.0 - Comunicação entre sistemas
-
