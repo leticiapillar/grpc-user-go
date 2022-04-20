@@ -4,7 +4,7 @@ Example using gRPC wit GoLang.
 
 #### Commands
 
-Creating go module and generate protofile stubs
+**Creating go module and generate protofile stubs**
 ```bash
 # Create Go module
 go mod init github.com/leticiapillar/grpc-user-go
@@ -17,7 +17,7 @@ go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 protoc --proto_path=proto proto/*.proto --go_out=pb --go-grpc_out=pb
 ```
 
-Implementing Server gRPC
+**Server gRPC implementation**
 - dir: `cmd/server/server.go`
 - host: `localhost:5051`
 - 
@@ -27,6 +27,33 @@ go get google.golang.org/grpc
 
 # Run server
 go run cmd/server/server.go
+```
+
+**UserService implementation**
+- dir: `services/user.go`
+
+**Call UserServer**
+- Using evans client to test the requests to server
+- Install [Evans gRPC Client](https://github.com/ktr0731/evans)
+- we need register grpcServer reflection to use evans client
+```bash
+# Run gRPC server
+go run cmd/server/server.go
+
+# Run evans client
+evans -r repl --host localhost --port 5051
+...
+
+pb.UserService@localhost:5051> service UserService
+pb.UserService@localhost:5051> call AddUser
+id (TYPE_STRING) => 100
+name (TYPE_STRING) => Leticia
+email (TYPE_STRING) => leticia@leticia.com
+{
+  "email": "leticia@leticia.com",
+  "id": "123",
+  "name": "Leticia"
+}
 ```
 
 #### References
