@@ -2,6 +2,10 @@
 
 Example using gRPC wit GoLang.
 
+Formats of comunication:
+- API Unary: service `AddUnser(...)`
+- API Stream: service `AddUserStream(...)`
+
 #### Commands
 
 **Creating go module and generate protofile stubs**
