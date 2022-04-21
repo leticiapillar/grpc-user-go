@@ -24,8 +24,8 @@ func (*UserService) AddUser(ctx context.Context, req *pb.User) (*pb.User, error)
 	fmt.Println(req.GetName())
 
 	return &pb.User{
-		Id: "123",
-		Name: req.GetName(),
+		Id:    "123",
+		Name:  req.GetName(),
 		Email: req.GetEmail(),
 	}, nil
 }
@@ -34,31 +34,31 @@ func (*UserService) AddUser(ctx context.Context, req *pb.User) (*pb.User, error)
 func (*UserService) AddUserStream(req *pb.User, stream pb.UserService_AddUserStreamServer) error {
 	stream.Send(&pb.UserResultStream{
 		Status: "init",
-		User: &pb.User{},
+		User:   &pb.User{},
 	})
 	time.Sleep(time.Second * 3)
 
 	stream.Send(&pb.UserResultStream{
 		Status: "inserting",
-		User: &pb.User{},
+		User:   &pb.User{},
 	})
 	time.Sleep(time.Second * 3)
 
 	stream.Send(&pb.UserResultStream{
 		Status: "User has been inserted",
 		User: &pb.User{
-			Id: "123",
-			Name: req.GetName(),
+			Id:    "123",
+			Name:  req.GetName(),
 			Email: req.GetEmail(),
 		},
 	})
 	time.Sleep(time.Second * 3)
-	
+
 	stream.Send(&pb.UserResultStream{
 		Status: "completed",
 		User: &pb.User{
-			Id: "123",
-			Name: req.GetName(),
+			Id:    "123",
+			Name:  req.GetName(),
 			Email: req.GetEmail(),
 		},
 	})
@@ -75,18 +75,38 @@ func (*UserService) AddUsers(stream pb.UserService_AddUsersServer) error {
 		req, err := stream.Recv()
 		if err == io.EOF {
 			return stream.SendAndClose(&pb.Users{
-				User: users,		})
+				User: users})
 		}
 		if err != nil {
 			log.Fatalf("Error receiving stream: %v", err)
 		}
 
 		users = append(users, &pb.User{
-			Id: req.GetId(),
-			Name: req.GetName(),
+			Id:    req.GetId(),
+			Name:  req.GetName(),
 			Email: req.GetEmail(),
 		})
 		fmt.Println("Adding", req.GetName())
 	}
 }
 
+// Service gRPC API Bidirectional Streaming
+func (*UserService) AddUserStreamBoth(stream pb.UserService_AddUserStreamBothServer) error {
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error receiving stream for client: %v", err)
+		}
+
+		err = stream.Send(&pb.UserResultStream{
+			Status: "inserted",
+			User:   req,
+		})
+		if err != nil {
+			log.Fatalf("Error sending stream to the client: %v", err)
+		}
+	}
+}
