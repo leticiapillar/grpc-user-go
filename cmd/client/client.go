@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"github.com/leticiapillar/grpc-user-go/pb"
 	"google.golang.org/grpc"
@@ -19,7 +20,8 @@ func main() {
 
 	client := pb.NewUserServiceClient(connection)
 	// AddUser(client)
-	AddUserStream(client)
+	// AddUserStream(client)
+	AddUsers(client)
 }
 
 // test request to service gRCP - API unary
@@ -60,4 +62,41 @@ func AddUserStream(client pb.UserServiceClient) {
 		}
 		fmt.Println("Status: ", stream.Status, " - ", stream.GetUser())
 	}
+}
+
+// test request to service gRCP - API client streaming
+func AddUsers(client pb.UserServiceClient) {
+	reqs := []*pb.User{
+		&pb.User{
+			Id: "001",
+			Name: "Leticia",
+			Email: "leticia@test.com",
+		},
+		&pb.User{
+			Id: "002",
+			Name: "Maria",
+			Email: "maria@test.com",
+		},
+		&pb.User{
+			Id: "003",
+			Name: "Ana",
+			Email: "ana@test.com",
+		},
+	}
+
+	stream, err := client.AddUsers(context.Background())
+	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
+	}
+
+	for _, req := range reqs {
+		stream.Send(req)
+		time.Sleep(time.Second * 3)
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Error receiving response: %v", err)
+	}
+	fmt.Println(res)
 }
