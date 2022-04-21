@@ -16,7 +16,7 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-// gRPC API Unary
+// Service gRPC API Unary
 func (*UserService) AddUser(ctx context.Context, req *pb.User) (*pb.User, error) {
 
 	fmt.Println(req.GetName())
@@ -28,7 +28,7 @@ func (*UserService) AddUser(ctx context.Context, req *pb.User) (*pb.User, error)
 	}, nil
 }
 
-// gRPC API Stream
+// Service gRPC API Server Streaming
 func (*UserService) AddUserStream(req *pb.User, stream pb.UserService_AddUserStreamServer) error {
 	stream.Send(&pb.UserResultStream{
 		Status: "init",
