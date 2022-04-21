@@ -21,7 +21,8 @@ func main() {
 	client := pb.NewUserServiceClient(connection)
 	// AddUser(client)
 	// AddUserStream(client)
-	AddUsers(client)
+	// AddUsers(client)
+	AddUserStreamBoth(client)
 }
 
 // test request to service gRCP - API unary
@@ -68,18 +69,18 @@ func AddUserStream(client pb.UserServiceClient) {
 func AddUsers(client pb.UserServiceClient) {
 	reqs := []*pb.User{
 		&pb.User{
-			Id: "001",
-			Name: "Leticia",
+			Id:    "001",
+			Name:  "Leticia",
 			Email: "leticia@test.com",
 		},
 		&pb.User{
-			Id: "002",
-			Name: "Maria",
+			Id:    "002",
+			Name:  "Maria",
 			Email: "maria@test.com",
 		},
 		&pb.User{
-			Id: "003",
-			Name: "Ana",
+			Id:    "003",
+			Name:  "Ana",
 			Email: "ana@test.com",
 		},
 	}
@@ -99,4 +100,59 @@ func AddUsers(client pb.UserServiceClient) {
 		log.Fatalf("Error receiving response: %v", err)
 	}
 	fmt.Println(res)
+}
+
+// test request to service gRCP - API bidirectional streaming
+func AddUserStreamBoth(client pb.UserServiceClient) {
+
+	stream, err := client.AddUserStreamBoth(context.Background())
+	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
+	}
+
+	reqs := []*pb.User{
+		&pb.User{
+			Id:    "001",
+			Name:  "Leticia",
+			Email: "leticia@test.com",
+		},
+		&pb.User{
+			Id:    "002",
+			Name:  "Maria",
+			Email: "maria@test.com",
+		},
+		&pb.User{
+			Id:    "003",
+			Name:  "Ana",
+			Email: "ana@test.com",
+		},
+	}
+
+	wait := make(chan int)	
+
+	go func() {
+		for _, req := range reqs {
+			fmt.Println("Sending user: ", req.GetName())
+			stream.Send(req)
+			time.Sleep(time.Second * 2)
+		}
+		stream.CloseSend()
+	}()
+
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalf("Error receiving data: %v", err)
+				break
+			}
+			fmt.Printf("Receiving user %v with status: %v \n", res.GetUser().GetName(), res.GetStatus())
+		}
+		close(wait)
+	}()
+
+	<-wait
 }

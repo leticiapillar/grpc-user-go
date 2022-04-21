@@ -3,9 +3,10 @@
 Example using gRPC wit GoLang.
 
 Formats of comunication:
-- API Unary: service `AddUnser(...)`
+- API Unary: service `AddUser(...)`
 - API Server Streaming: service `AddUserStream(...)`
 - API Client Streaming: service `AddUsers(...)`
+- API Bidirectional Streaming: service `AddUserStreamBoth(...)`
 
 #### Commands
 
